@@ -4,9 +4,20 @@ if (array_key_exists('login', $_REQUEST) &&
  	require 'config.phplib';
 	$conn = pg_connect("user=".$CONFIG['username'].
 	    " dbname=".$CONFIG['database']);
+	/*
 	$result = pg_query("SELECT * from users
 	    WHERE login='".$_REQUEST['login']."'
 	    AND password='".$_REQUEST['password']."'");
+	*/
+	$result = pg_query_params($conn, 
+	"SELECT * 
+	FROM users
+	
+	WHERE login=$1
+	AND password=$2",
+	 array(mysql_real_escape_string($_REQUEST['login']), mysql_real_escape_string$_REQUEST['password']) ));
+
+	
 	$row = pg_fetch_assoc($result);
 	if ($row === False) {
 		require 'header.php';
