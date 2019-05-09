@@ -4,11 +4,8 @@ if (array_key_exists('login', $_REQUEST) &&
  	require 'config.phplib';
 	$conn = pg_connect("user=".$CONFIG['username'].
 	    " dbname=".$CONFIG['database']);
-	/*
-	$result = pg_query("SELECT * from users
-	    WHERE login='".$_REQUEST['login']."'
-	    AND password='".$_REQUEST['password']."'");
-	*/
+	
+	// Used parametarized query to avoid SQL injection
 	$result = pg_query_params($conn, 
 	"SELECT * 
 	FROM users
