@@ -20,8 +20,10 @@ if (array_key_exists("username", $_POST)) {
 			exit();
 		}
 	}
+	$result = pg_query_params($conn, "SELECT role users
+			WHERE login=$1 ",
+ 			array(mysql_real_escape_string($_POST['username'])));
 
-	$query = "select role from users where login='$_POST[username]'";
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
 	$res = pg_query($conn, $query);
