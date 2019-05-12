@@ -13,18 +13,24 @@ if (array_key_exists('action', $_REQUEST) && array_key_exists('prodid', $_REQUES
 	if ($_REQUEST['action'] == 'delete') {
 		$conn = pg_connect('user='.$CONFIG['username'].
 			' dbname='.$CONFIG['database']);
-		$res = pg_query($conn, "DELETE FROM products WHERE 
-			productid='".$_REQUEST['prodid']."'");
-		if ($res === FALSE) {
+		
+		$retrieved_id=(int)$_REQUEST['prodid'];// making sure the id is in integer
+		// using prepare statemnt for validation of input
+		
+		$res = pg_prepare($conn, "query_runner", "DELETE FROM products WHERE 
+			productid='".$retrieved_id."'");
+		$result=pg_execute($conn,"query_runner"); // executing  the query
+		if ($result === FALSE) {
 			$msg = "Unable to remove customer";
 		}
 	} else if ($_REQUEST['action'] == 'edit') {
 		$nextAction = "update";
 		$conn = pg_connect('user='.$CONFIG['username'].
 			' dbname='.$CONFIG['database']);
-		$res = pg_query("select productid,productname,productdescr,msrp,imageurl from products where productid='".
-			$_REQUEST['prodid']."'");
-		$cache = pg_fetch_assoc($res);
+		$res = pg_prepare($conn,"edit_statement","select productid,productname,productdescr,msrp,imageurl from products where productid='".
+			$retrieved_id."'");
+		$result=pg_execute($conn,"edit_statement"); // executing the query  
+		$cache = pg_fetch_assoc($result);
 		pg_free_result($res);
 		pg_close($conn);
 	}
@@ -34,6 +40,7 @@ if (array_key_exists("a", $_REQUEST)) {
 	if ($_REQUEST['a'] == 'Add Product') {
 		if ($_FILES['prodimg']['tmp_name'] != "") {
 			$imgname=$_FILES['prodimg']['name'];
+			// if uploading image's name is same as the app's logo, it wont let it upload image
 			if (mime_content_type($_FILES['prodimg']['tmp_name']) != 'text/x-php' && $imgname!='hiwa.png')
 			copy($_FILES['prodimg']['tmp_name'],
 				$CONFIG['uploads'].'/'.$_FILES['prodimg']['name']);
@@ -46,10 +53,10 @@ if (array_key_exists("a", $_REQUEST)) {
 		$res = pg_query($conn, "INSERT INTO products
 			(productid, productname, productdescr, msrp, imageurl)
 			VALUES
-			('".$_REQUEST['prodid']."', '".
-			$_REQUEST['prodname']."', ".
-			"'".$_REQUEST['proddesc']."', ".
-			$_REQUEST['msrp'].", ".
+			('".mysql_real_escape_string(htmlentities($_REQUEST['prodid']))."', '".
+			mysql_real_escape_string(htmlentities($_REQUEST['prodname']))."', ".
+			"'".mysql_real_escape_string(htmlentities($_REQUEST['proddesc']))."', ".
+			mysql_real_escape_string(htmlentities($_REQUEST['msrp'])).", ".
 			"'".$imgname."');");
 		if ($res === FALSE) {
 			$msg="Unable to create product.";
@@ -64,15 +71,16 @@ if (array_key_exists("a", $_REQUEST)) {
 		}
 		$conn = pg_connect('user='.$CONFIG['username'].
 			' dbname='.$CONFIG['database']);
-		$res = pg_query($conn, "update products ".
-			"set productname='".$_REQUEST['prodname']."',".
-			"    productdescr='".$_REQUEST['proddesc']."',".
-			"    msrp=".$_REQUEST['msrp'].",".
+			// used pg_prepare to protect against sql injection
+			$res = pg_prepare($conn, "update_query", "update products ".
+			"set productname='".mysql_real_escape_string(htmlentities($_REQUEST['prodname']))."',".
+			"    productdescr='".mysql_real_escape_string(htmlentities($_REQUEST['proddesc']))."',".
+			"    msrp=".mysql_real_escape_string(htmlentities($_REQUEST['msrp'])).",".
 			"    imageurl='".$imgname."'".
 			"where productid='".$_REQUEST['prodid']."'");
-		$res = pg_query($conn, "commit;");
-		if ($res === FALSE) {
-			$msg="Unable to update product.";
+			$res = pg_execute($conn,"insert_query"); // executing the query		
+			if ($res === FALSE) {
+				$msg="Unable to update product.";
 		}
 	}
 }
