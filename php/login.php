@@ -7,11 +7,7 @@ if (array_key_exists('login', $_REQUEST) &&
 	
 	// Used parametarized query to avoid SQL injection
 	$result = pg_query_params($conn, 
-	"SELECT * 
-	FROM users
-	
-	WHERE login=$1
-	AND password=$2",
+	"SELECT * FROM users WHERE login=$1 AND password=$2",
 	 array(mysql_real_escape_string($_REQUEST['login']), mysql_real_escape_string$_REQUEST['password']) ));
 
 	
