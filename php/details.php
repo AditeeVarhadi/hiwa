@@ -2,8 +2,8 @@
 require 'config.phplib';
 
 $msg="";
-if (!array_key_exists('hiwa-user', $_COOKIE) ||
-    !array_key_exists('hiwa-role', $_COOKIE)) {
+	if (!isset($_SESSION['hiwa-user'])) ||
+	(!isset($_SESSION['hiwa-role'])) {
 	Header("Location: login.php");
 	exit();
 }
@@ -12,7 +12,7 @@ if (!array_key_exists('orderid', $_REQUEST)) {
 	exit();
 }
 
-$role=$_COOKIE['hiwa-role'];
+$role=$_SESSION['hiwa-role'];
 if (array_key_exists('action', $_REQUEST)) {
 	switch ($_REQUEST['action']) {
 		case 'Add item':
@@ -55,7 +55,7 @@ if (array_key_exists('action', $_REQUEST)) {
 <body>
 <?php require 'header.php';?>
 <div class="title">HIWA Manage Order</div>
-<div class="subtitle">Logged in as <?php echo $_COOKIE['hiwa-user'];?>
+<div class="subtitle">Logged in as <?php echo $_SESSION['hiwa-user'];?>
 	(<?php echo $role; ?>)
 </div>
 
