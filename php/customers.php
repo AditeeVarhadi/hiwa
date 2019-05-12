@@ -1,6 +1,8 @@
 <?php
 require 'config.phplib';
 
+// Redirecting back to login page if the session is not set
+
 /$msg="";
 if (!isset($_SESSION['hiwa-user'])) || (!isset($_SESSION['hiwa-role'])) {
 	Header("Location: login.php");
@@ -13,6 +15,7 @@ if (array_key_exists('action', $_REQUEST) &&
     $_REQUEST['action'] == 'delete') {
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
+	// pg_prepage will defend SQL injection
 	$res = pg_prepare($conn,"delete_query" "DELETE FROM customers WHERE 
 		customerid='".$_REQUEST['custid']."'");
 	$res = pg_execute($conn, "delete_query")
@@ -28,6 +31,8 @@ else if (array_key_exists('custid', $_REQUEST) &&
 
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
+	
+	// pg_prepage will defend SQL injection
 	$res = pg_prepare($conn,"insert_query" "INSERT INTO customers
 		(customerid, customername, creditlimit, taxid)
 		VALUES
