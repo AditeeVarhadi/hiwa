@@ -7,15 +7,15 @@ if (!isset($_SESSION['hiwa-user'])) || (!isset($_SESSION['hiwa-role'])) {
 	exit();
 }
 
-$role=$_COOKIE['hiwa-role'];
-
+$role=$_SESSION['hiwa-role'];
 if (array_key_exists('action', $_REQUEST) &&
     array_key_exists('custid', $_REQUEST) &&
     $_REQUEST['action'] == 'delete') {
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
-	$res = pg_query($conn, "DELETE FROM customers WHERE 
+	$res = pg_prepare($conn,"delete_query" "DELETE FROM customers WHERE 
 		customerid='".$_REQUEST['custid']."'");
+	$res = pg_execute($conn, "delete_query")
 	if ($res === False) {
 		$msg = "Unable to remove customer";
 	}
@@ -51,7 +51,7 @@ else if (array_key_exists('custid', $_REQUEST) &&
 <body>
 <?php require 'header.php';?>
 <div class="title">HIWA Manage Customers</div>
-<div class="subtitle">Logged in as <?php echo $_COOKIE['hiwa-user'];?>
+<div class="subtitle">Logged in as <?php echo $_SESSION['hiwa-user'];?>
 	(<?php echo $role; ?>)
 </div>
 
