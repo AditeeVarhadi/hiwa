@@ -1,9 +1,8 @@
 <?php
 require 'config.phplib';
 
-$msg="";
-if (!array_key_exists('hiwa-user', $_COOKIE) ||
-    !array_key_exists('hiwa-role', $_COOKIE)) {
+/$msg="";
+if (!isset($_SESSION['hiwa-user'])) || (!isset($_SESSION['hiwa-role'])) {
 	Header("Location: login.php");
 	exit();
 }
@@ -29,15 +28,16 @@ else if (array_key_exists('custid', $_REQUEST) &&
 
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
-	$res = pg_query($conn, "INSERT INTO customers
+	$res = pg_prepare($conn,"insert_query" "INSERT INTO customers
 		(customerid, customername, creditlimit, taxid)
 		VALUES
 		('".$_REQUEST['custid']."', '".
 		$_REQUEST['custname']."', ".
 		$_REQUEST['limit'].", '".
 		$_REQUEST['taxid']."')");
+		$res = pg_execute($conn, "insert_query")
 	if ($res === False) {
-		$msg="Unable to create customer.";
+		$msg="Customer cannot be created!!";
 	}
 }
 ?>
