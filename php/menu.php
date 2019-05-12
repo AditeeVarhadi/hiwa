@@ -1,10 +1,10 @@
 <?php
-if (!array_key_exists('hiwa-user', $_COOKIE) ||
-    !array_key_exists('hiwa-role', $_COOKIE)) {
+// Redirecting to loging page if session is not set
+if (!isset($_SESSION['user'] || !isset($_SESSION['role']){ // if session is not set it will redirect to the main page
 	Header("Location: login.php");
 	exit();
 }
-$role=$_COOKIE['hiwa-role'];
+$role=$_SESSION['hiwa-role'];
 ?>
 <html>
 <head>
@@ -15,7 +15,7 @@ $role=$_COOKIE['hiwa-role'];
 <body>
 <?php require 'header.php';?>
 <div class="title">HIWA Main Menu</div>
-<div class="subtitle">Logged in as <?php echo $_COOKIE['hiwa-user'];?>
+<div class="subtitle">Logged in as <?php echo $_SESSION['hiwa-user'];?>
 	(<?php echo $role; ?>)
 </div>
 
