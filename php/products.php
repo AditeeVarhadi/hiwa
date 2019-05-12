@@ -1,14 +1,12 @@
 <?php
 require 'config.phplib';
-
-$msg="";
-if (!array_key_exists('hiwa-user', $_COOKIE) ||
-    !array_key_exists('hiwa-role', $_COOKIE)) {
+// Redirecting to loging page if session is not set
+if (!isset($_SESSION['user'] || !isset($_SESSION['role']){ // if session is not set it will redirect to the main page
 	Header("Location: login.php");
 	exit();
 }
 
-$role=$_COOKIE['hiwa-role'];
+$role=$_SESSION['hiwa-role'];
 
 $nextAction = "blank";
 if (array_key_exists('action', $_REQUEST) && array_key_exists('prodid', $_REQUEST)) {
@@ -167,7 +165,7 @@ pg_close($conn);
 </tr>
 <tr>
 	<td>Suggested Retail Price:</td>
-	<td><input type="text" name="msrp" size="25"
+	<td><input type="number" min="0" name="msrp" size="25"
 	<?php if ($nextAction=="update") echo 'value="'.$cache['msrp'].'"';?>
 	></td>
 </tr>
