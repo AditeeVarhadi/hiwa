@@ -20,14 +20,17 @@ if (array_key_exists("username", $_POST)) {
 			exit();
 		}
 	}
+	// query_params will protect against SQL injection
 	$result = pg_query_params($conn, "SELECT role users
 			WHERE login=$1 ",
  			array(mysql_real_escape_string($_POST['username'])));
 
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
-	$res = pg_query($conn, $query);
-	if (pg_num_rows($res) == 1) {
+	$res = pg_prepare($conn, "result_query", $query); // using prepare to protect against sql injection
+	$executed_result = pg_execute($conn, 'result_query');
+	
+	if (pg_num_rows($executed_result) == 1) {
 		print('<P>By continuing this process, you will reset the password of <span style="font-weight:bold">'.
 			$_POST['username'].'</span>.</p>');
 		print("<p>To continue, check the box and hit the Submit button.</p>");
