@@ -1,5 +1,4 @@
 <?php
-	setcookie('hiwa-user', '', time()-1);
-	setcookie('hiwa-role', '', time()-1);
+session_destroy();// to delete the current session
 	Header("Location: login.php");
 ?>
